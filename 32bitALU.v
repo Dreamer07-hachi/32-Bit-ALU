@@ -66,8 +66,28 @@ mux2isto1 #(
 	.y(S_011)
 );
 
+
+wire s_6; 
+mux2isto1 #(
+    .width(32)
+)s6_110(
+	.i0(A),.i1(S),
+	.sel(Opcode[0]),
+	.y(S_6)
+);
+
+wire s_7; 
+	mux2isto1 #(
+    .width(32)
+	)s111(
+		.i0(32'b0),.i1(S),
+	.sel(Opcode[0]),
+		.y(s_7)
+);
+	
+	
 mux8isto1_32bit op(
-    . i0(S), .i1(S_001),. i2(S_010), .i3(S_011), .i4(S), .i5(S_101), .i6(32'd0), .i7(A),   // 8 discrete 32-bit inputs
+	. i0(S), .i1(S_001),. i2(S_010), .i3(S_011), .i4(S), .i5(S_101), .i6(s_6), .i7(s_7),   // 8 discrete 32-bit inputs
     .sel({Opcode[3],Opcode[2],Opcode[1]}),                               // 3-bit select line
     .y(Y)                                // 32-bit output
 );
