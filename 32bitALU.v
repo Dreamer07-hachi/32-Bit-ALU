@@ -1,4 +1,4 @@
-`timescale 1ns / 1ps
+`timescale 1ns/1ps
 
 module ALU(
 input wire[31:0]  A,B ,
@@ -24,7 +24,7 @@ wire overflow,carry;
 
 topmodule brentkungadder(
 .A(A),.B(B), .S(S),.P(S_0110),.G(S_0100),  .Cin(Cin), .Overflow(overflow),
-.Mode(Opcode[0]), .Mode_1(Opcode[3]), .Carry(carry)
+.Mode(Opcode[0]), .Mode_1(Opcode[3]^Opcode[2]), .Carry(carry)
 );
    
  barrel_shifter sllslr(
@@ -66,17 +66,16 @@ mux2isto1 #(
 	.y(S_011)
 );
 
-
-wire s_6; 
+wire[31:0] s_6; 
 mux2isto1 #(
     .width(32)
 )s6_110(
 	.i0(A),.i1(S),
 	.sel(Opcode[0]),
-	.y(S_6)
+	.y(s_6)
 );
 
-wire s_7; 
+wire[31:0] s_7; 
 	mux2isto1 #(
     .width(32)
 	)s111(
@@ -88,7 +87,7 @@ wire s_7;
 	
 mux8isto1_32bit op(
 	. i0(S), .i1(S_001),. i2(S_010), .i3(S_011), .i4(S), .i5(S_101), .i6(s_6), .i7(s_7),   // 8 discrete 32-bit inputs
-    .sel({Opcode[3],Opcode[2],Opcode[1]}),                               // 3-bit select line
+    .sel(Opcode[3:1]),                               // 3-bit select line
     .y(Y)                                // 32-bit output
 );
    assign Zero = ~|Y;
@@ -101,8 +100,6 @@ mux8isto1_32bit op(
    
    assign Carry = carry& (~x); 
    assign Overflow = overflow& (~x); 
-
-	//comparator module
     comp p3(
    .c(carry),.z(Zero),.n(Negative),.v(overflow),
    .opcode(Opcode),

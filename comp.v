@@ -5,13 +5,14 @@ module comp(
     output wire equalto, Agreater,Alesser
     );
     
-    wire t1, t2, t3, t4, cbar;
+    wire t1, t2, t3, t4, cbar,opmatch;
     
-    xor (t1,n,v);
-    not (cbar, c);
-    and (t2,opcode[3],opcode[2],opcode[0]) ;
+    xor (t1,n,v);   //n^v
+    not (cbar, c);   //~c
+    and (t2,opcode[3],opcode[2]) ;
+    and (opmatch, t2, opcode[0]);
     
-    assign equalto = t2 & z; 
+    assign equalto = opmatch & z; 
     
     
 mux2isto1 #(
@@ -23,9 +24,9 @@ mux2isto1 #(
   .y(t3)
 );
     
-    assign Agreater=t3&t2;
-    nand (t4,z,t3);
-    assign Alesser=t4&t2; 
+    assign Alesser=t3&opmatch;
+    nor (t4,z,t3);
+    assign Agreater=t4&opmatch; 
     
     
 endmodule
