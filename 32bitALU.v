@@ -81,6 +81,8 @@ mux8isto1_32bit op(
    
    assign Carry = carry& (~x); 
    assign Overflow = overflow& (~x); 
+
+	//comparator module
     comp p3(
    .c(carry),.z(Zero),.n(Negative),.v(overflow),
    .opcode(Opcode),
