@@ -22,8 +22,13 @@ wire [31:0]S_101; //o/p from ROL/ROR
 
 wire overflow,carry; 
 
+assign S_0100 = A & B;
+assign S_0110 = A ^ B;
+
+wire [31:0] bka_P_dummy, bka_G_dummy;
+
 topmodule brentkungadder(
-.A(A),.B(B), .S(S),.P(S_0110),.G(S_0100),  .Cin(Cin), .Overflow(overflow),
+.A(A),.B(B), .S(S),.P(bka_P_dummy),.G(bka_G_dummy),  .Cin(Cin), .Overflow(overflow),
 .Mode(Opcode[0]), .Mode_1(Opcode[3]^Opcode[2]), .Carry(carry)
 );
    
