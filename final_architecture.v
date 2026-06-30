@@ -1,117 +1,57 @@
 module top_module(
-
-    input clk,
-    input rst,
-    input start,
-
-    input [31:0] A_in,
-    input [31:0] B_in,
-
+    input clk,rst,
+    input [31:0] A_in,B_in,
     input [3:0] opcode,
     input cin,
-
     output [31:0] result,
-    output C,
-    output N,
-    output V,
-    output Z,
-    output done
-
+    output [6:0]flags
 );
 
-// FSM Signals
+//enable signals 
 wire load_A;
-wire load_B;
-wire result_load;
-wire flag_load;
+wire load_B, load_cin;
+wire load_opcode; 
+wire load_result;
+wire load_flags;
 
-// Register Outputs
+//output wires from the registers A and B
 wire [31:0] regA;
 wire [31:0] regB;
-
-// ALU Outputs
+wire [3:0] rego; 
+wire regCin; 
+// o/p regs 
 wire [31:0] alu_result;
-wire carry;
-wire negative;
-wire overflow;
-wire zero;
-
-control_unit CU(
-
-    .clk(clk),
-    .rst(rst),
-    .start(start),
-    .load_A(load_A),
-    .load_B(load_B),
-    .result_load(result_load),
-    .flag_load(flag_load),
-    .done(done)
-
-);
-
-input_registers INPUTS(
-
-    .clk(clk),
-    .rst(rst),
-
-    .load_A(load_A),
-    .load_B(load_B),
-
-    .A_in(A_in),
-    .B_in(B_in),
-
-    .regA(regA),
-    .regB(regB)
-
-);
+wire [6:0] alu_flags; 
 
 ALU alu1(
-
-    .A(regA),
-    .B(regB),
-
-    .Opcode(opcode),
-    .Cin(cin),
-
-    .Y(alu_result),
-
-    .Carry(carry),
-    .Overflow(overflow),
-    .Negative(negative),
-    .Zero(zero)
-
+    .A(regA),.B(regB),.Opcode(reg0),.Cin(regCin),.Y(alu_result),.Carry(alu_flags[0]),.Overflow(alu_flags[2]),.Negative(alu_flags[1]),
+    .Zero(alu_flags[3]),.AgreaterB(alu_flags[5]),.AequalB(alu_flags[6]),.AlesserB(alu_flags[4])
 );
 
-result_reg RESULT(
-
-    .clk(clk),
-    .rst(rst),
-
-    .load_en(result_load),
-
-    .res_in(alu_result),
-
-    .result_out(result)
-
+ control_unit ctrlpath(
+    .clk(clk),.rst(rst),
+    .load_A(load_A),.load_B(load_B),.load_opcode(load_opcode),.result_load(load_result),.flag_load(load_flags),.load_cin(load_cin)
 );
 
-flag_register FLAGS(
+input_registers inputstage(
 
-    .clk(clk),
-    .rst(rst),
-
-    .load_en(flag_load),
-
-    .C(carry),
-    .N(negative),
-    .V(overflow),
-    .Z(zero),
-
-    .C_out(C),
-    .N_out(N),
-    .V_out(V),
-    .Z_out(Z)
-
+    .clk(clk),.rst(rst),.load_A(load_A),.load_B(load_B),.load_opcode(load_opcode),.load_cin(load_cin),.cin(cin),
+    .A_in(A_in),.B_in(B_in),.Opcode_in(opcode),.regcin(regCin),
+    .regA(regA),.regB(regB), .regOpcode(rego)
 );
+
+
+result_reg outputstage1(
+
+   .clk(clk),.rst(rst), .load_en(load_result),
+   .res_in(alu_result),
+  .result_out(result)
+);
+
+flag_register outputstage2(
+    .clk(clk), .rst(rst),.load_en(load_flags),.C(alu_flags[0]),.N(alu_flags[1]),.V(alu_flags[2]),.Z(alu_flags[3]),.less(alu_flags[4]),.great(alu_flags[5]),.equal(alu_flags[6]),
+ .flags(flags)
+);
+
 
 endmodule
