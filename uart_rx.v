@@ -5,8 +5,8 @@
 // immunity, and uses a 2-FF synchronizer on the async `rx` input.
 // -----------------------------------------------------------------------
 module uart_rx #(
-    parameter CLK_FREQ  = 50_000_000, // system clock frequency in Hz
-    parameter BAUD_RATE = 9600        // desired UART baud rate
+    parameter CLK_FREQ  = 100_000_000, // adjust to your board's system clock
+    parameter BAUD_RATE = 115200
 )(
     input  wire       clk,
     input  wire       rst_n,      // active-low synchronous reset
